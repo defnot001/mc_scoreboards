@@ -7,7 +7,6 @@ use clap::Parser;
 #[command(name = "mc-scoreboards")]
 pub struct Cli {
     /// The version of the game to generate the datapack for. Supported versions: 1.19.3, 1.19.4
-    #[arg(short = 'g', long = "gameversion")]
     pub game_version: String,
 
     /// The path to the stats directory. If this is passed, the program will also create an update.mcfunction file.
