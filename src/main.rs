@@ -1,5 +1,4 @@
 mod cli;
-mod compare;
 mod datapack;
 mod scoreboards;
 
