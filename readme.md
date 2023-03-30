@@ -1,4 +1,4 @@
-![Build Status](https://github.com/defnot001/mc_scoreboards/actions/workflows/rust.yml/badge.svg)
+![Build Status](https://github.com/defnot001/mc_scoreboards/actions/workflows/build.yml/badge.svg)
 
 # MC Scoreboards
 
