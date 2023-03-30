@@ -1,27 +1,67 @@
 use std::fs::{self, File};
 use std::io::{Error, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-use crate::stats::MCStat;
+use crate::cli::Cli;
+use crate::scoreboards::MCScoreboard;
 
-pub fn generate_datapack(stats: Vec<MCStat>, version: &str) {
-    create_datapack_structure(version).expect("Could not create datapack structure");
-    create_mcmeta_file(version).expect("Could not create mcmeta file");
-    write_create_remove_functions(stats, version).expect("Could not write function files");
+pub fn generate_datapack(scoreboards: Vec<MCScoreboard>, options: &Cli) -> Result<(), Error> {
+    let datapack_path = create_datapack_directory(&options)?;
+    let datapack_function_path = create_function_directory(&datapack_path)?;
+
+    create_mcmeta_file(&datapack_path, &options.game_version)?;
+    write_create_remove_functions(scoreboards, &datapack_function_path)?;
+
+    Ok(())
 }
 
-fn write_create_remove_functions(stats: Vec<MCStat>, version: &str) -> Result<(), Error> {
-    let dir_path = Path::new(&format!(
-        "datapacks/mc-scoreboards-{}/data/mc-scoreboards/functions",
+fn create_datapack_directory(options: &Cli) -> Result<PathBuf, Error> {
+    let datapack_path = Path::join(
+        &options.output_dir,
+        format!("datapacks/mc-scoreboards-{}", options.game_version),
+    );
+    fs::create_dir_all(&datapack_path)?;
+
+    Ok(datapack_path)
+}
+
+fn create_function_directory(datapack_path: &Path) -> Result<PathBuf, Error> {
+    let datapack_function_path = Path::join(datapack_path, "data/mc-scoreboards/functions");
+    if datapack_function_path.exists() {
+        fs::remove_dir_all(&datapack_function_path)?;
+    }
+    fs::create_dir_all(&datapack_function_path)?;
+
+    Ok(datapack_function_path)
+}
+
+fn create_mcmeta_file(datapack_path: &Path, version: &str) -> Result<(), Error> {
+    let mut file = File::create(datapack_path.join("pack.mcmeta"))?;
+
+    let content = format!(
+        r#"{{
+            "pack":{{
+                "pack_format": {},
+                "description": "All scoreboards for Minecraft {}"
+            }}
+        }}"#,
+        get_datapack_version(version),
         version
-    ))
-    .to_owned();
-    fs::create_dir_all(&dir_path)?;
+    );
 
-    let mut create_file = File::create(Path::join(&dir_path, "create.mcfunction"))?;
-    let mut remove_file = File::create(Path::join(&dir_path, "remove.mcfunction"))?;
+    file.write_all(&content.as_bytes())?;
 
-    for stat in stats {
+    Ok(())
+}
+
+fn write_create_remove_functions(
+    scoreboards: Vec<MCScoreboard>,
+    functions_path: &PathBuf,
+) -> Result<(), Error> {
+    let mut create_file = File::create(Path::join(&functions_path, "create.mcfunction"))?;
+    let mut remove_file = File::create(Path::join(&functions_path, "remove.mcfunction"))?;
+
+    for stat in scoreboards {
         if let Some(name) = stat.name {
             let create = format!(
                 "scoreboard objectives add {} {} \"{}\"\n",
@@ -39,34 +79,12 @@ fn write_create_remove_functions(stats: Vec<MCStat>, version: &str) -> Result<()
     Ok(())
 }
 
-fn create_datapack_structure(version: &str) -> Result<(), Error> {
-    fs::create_dir_all(format!(
-        "datapacks/mc-scoreboards-{version}/data/mc-scoreboards/functions"
-    ))?;
-
-    Ok(())
-}
-
-fn create_mcmeta_file(version: &str) -> Result<(), Error> {
-    let mut file = File::create(format!("datapacks/mc-scoreboards-{version}/pack.mcmeta"))?;
-
-    let content = format!(
-        r#"{{"pack":{{"pack_format":{},"description":"All scoreboards for Minecraft {}"}}}}"#,
-        get_datapack_version(version),
-        version
-    );
-
-    file.write_all(&content.as_bytes())?;
-
-    Ok(())
-}
-
 fn get_datapack_version(version: &str) -> u8 {
     match version {
         "1.16.5" => 6,
         "1.17.1" => 7,
         "1.18.2" => 9,
-        "1.19.1" | "1.19.2" | "1.19.3" => 10,
+        "1.19.2" | "1.19.3" => 10,
         "1.19.4" => 12,
         _ => panic!("Unsupported version: {}", version),
     }
