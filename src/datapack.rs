@@ -61,7 +61,7 @@ pub fn generate_datapack(
             for stat in mcstats {
                 writeln!(
                     &mut update_file,
-                    "scoreboard players set {} {} {} {}",
+                    "scoreboard players set {} {}{} {}",
                     stat.player_name, stat.stat_type, stat.item, stat.score
                 )?;
             }
