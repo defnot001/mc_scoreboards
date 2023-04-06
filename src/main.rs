@@ -19,7 +19,10 @@ fn main() {
     let scoreboards = scoreboards::get_scoreboards_from_version(&cli.game_version)
         .expect("Could not get scoreboards");
 
-    generate_datapack(scoreboards, &cli).expect("Could not generate datapack");
+    if let Err(e) = generate_datapack(scoreboards, &cli) {
+        eprintln!("Error: {}", e);
+        std::process::exit(1);
+    }
 
     println!(
         "Successfully generated datapack for Minecraft {}",
