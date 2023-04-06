@@ -107,20 +107,6 @@ fn map_stat(player_name: &str, stats: HashMap<String, u32>, short_type: &str) ->
     stats
 }
 
-// pub fn create_update_functions(stats: Vec<Stats>, functions_path: &Path) -> Result<(), Error> {
-//     let mut update_file = File::create(Path::join(&functions_path, "update.mcfunction"))?;
-
-//     for stat in stats {
-//         let mcstats = convert_stats(stat);
-
-//         for stat in mcstats {
-//             println!("scoreboard players set {}")
-//         }
-//     }
-
-//     Ok(())
-// }
-
 fn create_datapack_structure(functions_path: &Path) -> io::Result<()> {
     if functions_path.exists() {
         fs::remove_dir_all(functions_path)?;
