@@ -32,7 +32,7 @@ fn parse_scoreboards(file_content: String) -> Result<Vec<MCScoreboard>, Error> {
         let parts: Vec<&str> = stat.stat.split(':').collect();
         stat.name = Some(format!(
             "{}-{}",
-            &shorten_scoreboard_type(&parts[0]),
+            &shorten_scoreboard_type(parts[0]),
             &parts[1][10..]
         ));
     }
