@@ -1,6 +1,7 @@
 mod cli;
 mod datapack;
 mod scoreboards;
+mod stats;
 
 use clap::Parser;
 use cli::Cli;
