@@ -103,42 +103,6 @@ impl TryFrom<&Path> for StatFile {
 }
 
 #[derive(Debug)]
-struct Stats {
-    stats: MCStats,
-    uuid: Uuid,
-}
-
-impl TryFrom<&Path> for Stats {
-    type Error = Box<dyn Error>;
-
-    fn try_from(file_path: &Path) -> Result<Self, Self::Error> {
-        let file = File::open(file_path)?;
-        let reader = BufReader::new(file);
-        let parsed: StatFile = serde_json::from_reader(reader)?;
-
-        let Some(file_stem) = file_path.file_stem() else {
-            return Err(Box::new(IOError::new(
-                ErrorKind::NotFound,
-                "Failed to get filestem from file path.",
-            )));
-        };
-
-        let Some(stem_str) = file_stem.to_str() else {
-            return Err(Box::new(IOError::new(
-                ErrorKind::NotFound,
-                "Failed to convert filestem into string.",
-            )));
-        };
-
-        let uuid = Uuid::from_str(stem_str)?;
-
-        Ok(Stats {
-            stats: parsed.stats,
-            uuid,
-        })
-    }
-}
-
 pub struct PlayerStats {
     pub stats: MCStats,
     pub player_name: String,
@@ -161,35 +125,35 @@ pub fn get_stats(
     let stats: Vec<PlayerStats> = player_files
         .into_iter()
         .filter_map(|player_file| {
-            let stats = Stats::try_from(player_file.path.as_ref());
+            let stats = StatFile::try_from(player_file.path.as_ref());
 
             stats
                 .map(|stats| PlayerStats {
                     stats: stats.stats,
-                    player_name: player_file.player_name,
+                    player_name: player_file.player_name.to_string(),
                 })
-                .map_err(|e| println!("Error parsing stats file: {}", e))
+                .map_err(|e| {
+                    println!(
+                        "Error parsing stats file for {} ({}): {}",
+                        player_file.player_name, player_file.player_uuid, e
+                    );
+
+                    if let Ok(failed_file_str) = fs::read_to_string(player_file.path) {
+                        if failed_file_str[2..=5] == "stat".to_string() {
+                            println!(
+                                "{} still has the old stat format. Skipping...",
+                                player_file.player_name
+                            );
+                            return;
+                        }
+                        return;
+                    };
+                })
                 .ok()
         })
         .collect();
 
     Ok(stats)
-}
-
-fn get_stat_files(paths: Vec<PathBuf>) -> Vec<String> {
-    paths
-        .into_iter()
-        .filter_map(read_file_to_string)
-        .filter(|content| !content.is_empty())
-        .collect()
-}
-
-fn read_file_to_string(path: PathBuf) -> Option<String> {
-    fs::read_to_string(&path)
-        .map_err(|e| {
-            println!("Error reading file {}: {}", path.to_string_lossy(), e);
-        })
-        .ok()
 }
 
 fn get_player_files(
@@ -202,8 +166,8 @@ fn get_player_files(
 
     for file in stats_dir {
         match file {
-            Ok(f) => {
-                let filepath = f.path();
+            Ok(e) => {
+                let filepath = e.path();
 
                 if !filepath.is_file() || filepath.extension() != Some(OsStr::new("json")) {
                     println!("Skipping {}", filepath.to_string_lossy());
