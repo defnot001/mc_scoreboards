@@ -54,18 +54,22 @@ pub fn generate_datapack(
         let stats = get_stats(whitelist_path, stats_path)?;
 
         let mut update_file = File::create(Path::join(&paths.function_path, "update.mcfunction"))?;
+        let mut string_buf = String::new();
 
         for player_stats in stats {
             let mcstats = convert_stats(player_stats);
 
             for stat in mcstats {
-                writeln!(
-                    &mut update_file,
-                    "scoreboard players set {} {}{} {}",
+                let formatted = format!(
+                    "scoreboard players set {} {}{} {}\n",
                     stat.player_name, stat.stat_type, stat.item, stat.score
-                )?;
+                );
+
+                string_buf.push_str(&formatted);
             }
         }
+
+        update_file.write_all(string_buf.as_bytes())?;
     }
 
     Ok(())
