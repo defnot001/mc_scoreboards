@@ -94,9 +94,7 @@ If you specify this flag, the program will read the stats files and create a thi
 
 #### `--whitelist` (`-w`):
 
-If you want to save some time and only update scoreboards for whitelisted players, use this flag and point it at the whitlist.json file of your server.
-
-This flag only works if you also specify the `--stats` flag.
+Currently, this flag is required if you want to use the `--stats` flag and it also only works if you also specify the `--stats` flag.
 
 ```shell
 ./target/release/mc-scoreboards 1.19.3 -s /path/to/stats/folder -w /path/to/whitelist.json
@@ -117,6 +115,8 @@ The scoreboards are named accordingly:
 - `k-<mob>` Mobs killed
 - `kb-<mob>` Killed by mob
 - `z-<stat>` Custom stats (find all possible `stats` [here](https://minecraft.fandom.com/wiki/Statistics#List_of_custom_statistic_names))
+
+If you are looking for translation files, check out [scoreboard-translations](https://github.com/defnot001/scoreboard-translations) to get pretty printed json files for translation purposes.
 
 #### Acknowledgements
 
