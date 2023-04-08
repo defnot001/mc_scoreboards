@@ -139,14 +139,12 @@ pub fn get_stats(
                     );
 
                     if let Ok(failed_file_str) = fs::read_to_string(player_file.path) {
-                        if failed_file_str[2..=5] == "stat".to_string() {
+                        if failed_file_str[2..=5] == *"stat" {
                             println!(
                                 "{} still has the old stat format. Skipping...",
                                 player_file.player_name
                             );
-                            return;
                         }
-                        return;
                     };
                 })
                 .ok()
