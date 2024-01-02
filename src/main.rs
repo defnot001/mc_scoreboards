@@ -7,7 +7,9 @@ use clap::Parser;
 use cli::Cli;
 use datapack::generate_datapack;
 
-const SUPPORTED_VERSIONS: &[&str] = &["1.16.5", "1.17.1", "1.18.2", "1.19.2", "1.19.3", "1.19.4", "1.20.4"];
+const SUPPORTED_VERSIONS: &[&str] = &[
+    "1.16.5", "1.17.1", "1.18.2", "1.19.2", "1.19.3", "1.19.4", "1.20.4",
+];
 
 fn main() {
     let cli = Cli::parse();

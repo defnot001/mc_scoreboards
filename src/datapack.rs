@@ -169,6 +169,7 @@ fn get_datapack_version(version: &str) -> u8 {
         "1.18.2" => 9,
         "1.19.2" | "1.19.3" => 10,
         "1.19.4" => 12,
+        "1.20.4" => 26,
         _ => panic!("Unsupported version: {}", version),
     }
 }
