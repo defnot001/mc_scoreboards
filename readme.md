@@ -14,6 +14,7 @@ Currently supported versions:
 - 1.19.2
 - 1.19.3
 - 1.19.4
+- 1.20.4
 
 If you need a datapack an unsupported version, don't hesitate to open an issue or join my [Discord server](https://discord.gg/wmJ3WBYcZF).
 
@@ -38,7 +39,7 @@ cd mc_scoreboards
 Build the program:
 
 ```shell
-cargo build --release --all-features
+cargo build --release
 ```
 
 You should now have a binary in `target/release/mc_scoreboards`.
@@ -50,13 +51,13 @@ This CLI program accepts multiple arguments and flags that can be used to custom
 The most basic usage on Linux and Mac will look like this:
 
 ```shell
-./target/release/mc-scoreboards 1.19.3
+./target/release/mc-scoreboards 1.20.4
 ```
 
 On Windows, you will need to use the `.exe` file:
 
 ```shell
-./target/release/mc-scoreboards.exe 1.19.3
+./target/release/mc-scoreboards.exe 1.20.4
 ```
 
 This will create a datapack in the current directory with the name `scoreboards_1.19.3.zip`. You can then load this datapack on your server and execute the functions in it.
